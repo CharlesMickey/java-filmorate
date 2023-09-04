@@ -20,6 +20,7 @@ public class LocalDateAdapter extends TypeAdapter<LocalDate> {
             jsonWriter.nullValue();
         }
     }
+
     @Override
     public LocalDate read(final JsonReader jsonReader) throws IOException {
         if (jsonReader.peek() == JsonToken.NULL) {
