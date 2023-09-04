@@ -50,9 +50,9 @@ public class FilmController {
     log.debug("Put запрос /users, передан: {}", film);
 
     if (films.get(film.getId()) == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-              .body(jsonTransformer.toJson("Фильм не найден, соррян:)"));
-
+      return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(jsonTransformer.toJson("Фильм не найден, соррян:)"));
     }
 
     films.put(film.getId(), film);

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.time.LocalDate;
 
-
 public class JsonTransformer {
     public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();

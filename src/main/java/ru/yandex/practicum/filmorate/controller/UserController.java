@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,8 +48,9 @@ public class UserController {
     log.debug("Put запрос /users, передан: {}", user);
 
     if (users.get(user.getId()) == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-              .body(jsonTransformer.toJson("Пользователь не найден, сорри;)"));
+      return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(jsonTransformer.toJson("Пользователь не найден, сорри;)"));
     }
 
     users.put(user.getId(), user);
