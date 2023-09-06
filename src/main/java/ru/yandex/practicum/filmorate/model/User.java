@@ -21,7 +21,6 @@ public class User {
 
   private String name;
 
-  @NotNull(message = "Дата рождение – обязательное поле")
-  @Past(message = "Дата рождения не может быть в будущем")
+  @PastOrPresent(message = "Дата рождения не может быть в будущем")
   private LocalDate birthday;
 }

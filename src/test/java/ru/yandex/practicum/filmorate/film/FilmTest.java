@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.google.gson.Gson;
 import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,22 +19,26 @@ import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 @AutoConfigureMockMvc
 public class FilmTest {
 
+  private Film film;
   private static Gson jsonTransformer = JsonTransformer.getGson();
 
-  @Autowired
-  private MockMvc mockMvc;
-
-  @Test
-  public void testValidUser() throws Exception {
-    Film film = new Film();
-    film.setName("Жизнт прекрасна");
+  @BeforeEach
+  void setUp() {
+    film = new Film();
+    film.setName("Жизнь прекрасна");
     film.setDescription(
       "Времена Холокоста. Отец создает для сына фантастическую реальность, защищая его от ужасов войны." +
       "Эта история о любви и выживании."
     );
     film.setReleaseDate(LocalDate.of(1997, 1, 1));
     film.setDuration(1);
+  }
 
+  @Autowired
+  private MockMvc mockMvc;
+
+  @Test
+  public void testValidUser() throws Exception {
     mockMvc
       .perform(
         MockMvcRequestBuilders
@@ -57,17 +62,12 @@ public class FilmTest {
 
   @Test
   public void testNoValidDescription() throws Exception {
-    Film film = new Film();
-    film.setName("Жизнт прекрасна");
     film.setDescription(
       "Фильм \"Жизнь прекрасна\" (La vita è bella) - итальянская драмеди, выпущенная в 1997 году, режиссированная и" +
       " снятая Роберто Бениньи. Он рассказывает историю Гвидо, еврейского отца, и его маленького сына, Джошуа," +
       " которые отправляются в невероятное путешествие, чтобы защитить свою жизнь и сохранить свой оптимизм во " +
       "времена Холокоста."
     );
-    film.setReleaseDate(LocalDate.of(1997, 1, 1));
-    film.setDuration(1);
-
     mockMvc
       .perform(
         MockMvcRequestBuilders
@@ -86,15 +86,7 @@ public class FilmTest {
 
   @Test
   public void testNoValidFilmName() throws Exception {
-    Film film = new Film();
     film.setName("");
-    film.setDescription(
-      "Времена Холокоста. Отец создает для сына фантастическую реальность, защищая его от ужасов войны." +
-      "Эта история о любви и выживании."
-    );
-    film.setReleaseDate(LocalDate.of(1997, 1, 1));
-    film.setDuration(1);
-
     mockMvc
       .perform(
         MockMvcRequestBuilders
@@ -112,14 +104,7 @@ public class FilmTest {
   }
 
   @Test
-  public void testNoValidUseLogin() throws Exception {
-    Film film = new Film();
-    film.setName("Жизнь прекрасна");
-    film.setDescription(
-      "Времена Холокоста. Отец создает для сына фантастическую реальность, защищая его от ужасов войны." +
-      "Эта история о любви и выживании."
-    );
-    film.setReleaseDate(LocalDate.of(1997, 1, 1));
+  public void testNoValidDuration() throws Exception {
     film.setDuration(-1);
 
     mockMvc
