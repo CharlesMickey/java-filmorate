@@ -23,20 +23,20 @@ public class FilmController {
   @GetMapping("/films")
   public List<Film> getFilms() {
     List<Film> filmsList = filmService.getFilms();
-    log.debug("Get запрос /films, передан: {}", filmsList);
+    log.debug("Get request /films, data transmitted: {}", filmsList);
 
     return filmsList;
   }
 
   @PostMapping("/films")
-  public ResponseEntity<String> createFilm(@Valid @RequestBody Film film) {
-    log.debug("Post запрос /films, передан: {}", film);
+  public String createFilm(@Valid @RequestBody Film film) {
+    log.debug("Post request /films, data transmitted: {}", film);
     return filmService.createFilm(film);
   }
 
   @PutMapping("/films")
-  public ResponseEntity<String> updateFilm(@Valid @RequestBody Film film) {
-    log.debug("Put запрос /films, передан: {}", film);
+  public String updateFilm(@Valid @RequestBody Film film) {
+    log.debug("Put request /films, data transmitted: {}", film);
     return filmService.updateFilm(film);
   }
 }

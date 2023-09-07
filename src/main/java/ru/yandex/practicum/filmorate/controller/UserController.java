@@ -23,19 +23,19 @@ public class UserController {
   @GetMapping("/users")
   public List<User> getUsers() {
     List<User> usersList = userService.getUsers();
-    log.debug("Get запрос /users, передан: {}", usersList);
+    log.debug("Get request /users, data transmitted: {}", usersList);
     return usersList;
   }
 
   @PostMapping("/users")
-  public ResponseEntity<String> createUser(@Valid @RequestBody User user) {
-    log.debug("Post запрос /users, передан: {}", user);
+  public String createUser(@Valid @RequestBody User user) {
+    log.debug("Post equest /users, data transmitted: {}", user);
     return userService.createUser(user);
   }
 
   @PutMapping("/users")
-  public ResponseEntity<String> updateUser(@RequestBody User user) {
-    log.debug("Put запрос /users, передан: {}", user);
+  public String updateUser(@RequestBody User user) {
+    log.debug("Put request /users, data transmitted: {}", user);
     return userService.updateUser(user);
   }
 }

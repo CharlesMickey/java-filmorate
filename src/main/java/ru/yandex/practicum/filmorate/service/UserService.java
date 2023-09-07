@@ -4,9 +4,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
@@ -28,27 +27,24 @@ public class UserService {
     return usersList;
   }
 
-  public ResponseEntity<String> createUser(User user) {
+  public String createUser(User user) {
     if (
       user.getName() == null ||
-      user.getName().isEmpty() ||
       user.getName().isBlank()
     ) {
       user.setName(user.getLogin());
     }
     user.setId(setId());
     users.put(user.getId(), user);
-    return ResponseEntity.ok(jsonTransformer.toJson(user));
+    return jsonTransformer.toJson(user);
   }
 
-  public ResponseEntity<String> updateUser(User user) {
+  public String updateUser(User user) {
     if (users.get(user.getId()) == null) {
-      return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(jsonTransformer.toJson("Пользователь не найден"));
+      throw new NotFoundException("Пользователь не найден");
     }
 
     users.put(user.getId(), user);
-    return ResponseEntity.ok(jsonTransformer.toJson(user));
+    return jsonTransformer.toJson(user);
   }
 }
