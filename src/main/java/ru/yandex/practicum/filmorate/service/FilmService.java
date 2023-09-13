@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import com.google.gson.Gson;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
