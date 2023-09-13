@@ -11,9 +11,6 @@ import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
 @Service
 public class UserService {
-
-  private static Gson jsonTransformer = JsonTransformer.getGson();
-
   private int id = 0;
   private final HashMap<Integer, User> users = new HashMap<>();
 
@@ -27,7 +24,7 @@ public class UserService {
     return usersList;
   }
 
-  public String createUser(User user) {
+  public User createUser(User user) {
     if (
       user.getName() == null ||
       user.getName().isBlank()
@@ -36,15 +33,15 @@ public class UserService {
     }
     user.setId(setId());
     users.put(user.getId(), user);
-    return jsonTransformer.toJson(user);
+    return user;
   }
 
-  public String updateUser(User user) {
+  public User updateUser(User user) {
     if (users.get(user.getId()) == null) {
       throw new NotFoundException("Пользователь не найден");
     }
 
     users.put(user.getId(), user);
-    return jsonTransformer.toJson(user);
+    return user;
   }
 }

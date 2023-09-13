@@ -28,13 +28,13 @@ public class FilmController {
   }
 
   @PostMapping("/films")
-  public String createFilm(@Valid @RequestBody Film film) {
+  public Film createFilm(@Valid @RequestBody Film film) {
     log.debug("Post request /films, data transmitted: {}", film);
     return filmService.createFilm(film);
   }
 
   @PutMapping("/films")
-  public String updateFilm(@Valid @RequestBody Film film) {
+  public Film updateFilm(@Valid @RequestBody Film film) {
     log.debug("Put request /films, data transmitted: {}", film);
     return filmService.updateFilm(film);
   }

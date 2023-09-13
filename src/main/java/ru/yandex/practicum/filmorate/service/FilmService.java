@@ -28,7 +28,7 @@ public class FilmService {
     return filmsList;
   }
 
-  public String createFilm(Film film) {
+  public Film createFilm(Film film) {
     if (
       film.getReleaseDate() != null &&
       film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))
@@ -39,15 +39,15 @@ public class FilmService {
     }
     film.setId(setId());
     films.put(film.getId(), film);
-    return jsonTransformer.toJson(film);
+    return film;
   }
 
-  public String updateFilm(Film film) {
+  public Film updateFilm(Film film) {
     if (films.get(film.getId()) == null) {
       throw new NotFoundException("Фильм не найден");
     }
 
     films.put(film.getId(), film);
-    return jsonTransformer.toJson(film);
+    return film;
   }
 }
