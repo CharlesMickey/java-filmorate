@@ -27,13 +27,13 @@ public class UserController {
   }
 
   @PostMapping("/users")
-  public String createUser(@Valid @RequestBody User user) {
+  public User createUser(@Valid @RequestBody User user) {
     log.debug("Post equest /users, data transmitted: {}", user);
     return userService.createUser(user);
   }
 
   @PutMapping("/users")
-  public String updateUser(@RequestBody User user) {
+  public User updateUser(@RequestBody User user) {
     log.debug("Put request /users, data transmitted: {}", user);
     return userService.updateUser(user);
   }

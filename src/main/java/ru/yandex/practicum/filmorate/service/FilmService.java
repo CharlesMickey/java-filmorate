@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import com.google.gson.Gson;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,12 +8,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
 @Service
 public class FilmService {
 
-  private static Gson jsonTransformer = JsonTransformer.getGson();
   private final HashMap<Integer, Film> films = new HashMap<>();
   private int id = 0;
 
@@ -28,7 +25,7 @@ public class FilmService {
     return filmsList;
   }
 
-  public String createFilm(Film film) {
+  public Film createFilm(Film film) {
     if (
       film.getReleaseDate() != null &&
       film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))
@@ -39,15 +36,15 @@ public class FilmService {
     }
     film.setId(setId());
     films.put(film.getId(), film);
-    return jsonTransformer.toJson(film);
+    return film;
   }
 
-  public String updateFilm(Film film) {
+  public Film updateFilm(Film film) {
     if (films.get(film.getId()) == null) {
       throw new NotFoundException("Фильм не найден");
     }
 
     films.put(film.getId(), film);
-    return jsonTransformer.toJson(film);
+    return film;
   }
 }
