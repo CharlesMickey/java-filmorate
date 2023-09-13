@@ -9,12 +9,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
 @Service
 public class FilmService {
 
-  private static Gson jsonTransformer = JsonTransformer.getGson();
   private final HashMap<Integer, Film> films = new HashMap<>();
   private int id = 0;
 

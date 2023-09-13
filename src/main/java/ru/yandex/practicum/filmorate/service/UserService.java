@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
 @Service
 public class UserService {
