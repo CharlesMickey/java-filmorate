@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CustomExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
+  public ResponseEntity<Object> handleValidationException(
+    MethodArgumentNotValidException ex
+  ) {
     BindingResult bindingResult = ex.getBindingResult();
     Map<String, String> errors = new HashMap<>();
 

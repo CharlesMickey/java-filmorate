@@ -5,7 +5,9 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 @RestController
@@ -37,5 +39,28 @@ public class FilmController {
   public Film updateFilm(@Valid @RequestBody Film film) {
     log.debug("Put request /films, data transmitted: {}", film);
     return filmService.updateFilm(film);
+  }
+
+  @PutMapping("/films/{id}/like/{userId}")
+  public Film addLike(@PathVariable Integer id, @PathVariable Integer userId) {
+    log.debug("Put request /films/{}/like/{}", id, userId);
+    return filmService.addLike(id, userId);
+  }
+
+  @DeleteMapping("/films/{id}/like/{userId}")
+  public Film deleteLike(
+    @PathVariable Integer id,
+    @PathVariable Integer userId
+  ) {
+    log.debug("Delete like request /films/{}/like/{}", id, userId);
+    return filmService.deleteLike(id, userId);
+  }
+
+  @GetMapping("/films/popular")
+  public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
+    if(count <= 0) {
+      throw new BadRequestException("Если не хотите указывать количество – просто не указывайте.");
+    }
+    return filmService.getPopularFilms(count);
   }
 }

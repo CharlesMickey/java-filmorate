@@ -5,6 +5,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class FilmorateApplicationTests {
-
-}
+class FilmorateApplicationTests {}
