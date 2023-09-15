@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 @RestController
@@ -57,9 +56,17 @@ public class FilmController {
   }
 
   @GetMapping("/films/popular")
-  public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
-    if(count <= 0) {
-      throw new BadRequestException("Если не хотите указывать количество – просто не указывайте.");
+  public List<Film> getPopularFilms(
+    @RequestParam(
+      value = "count",
+      defaultValue = "10",
+      required = false
+    ) Integer count
+  ) {
+    if (count <= 0) {
+      throw new BadRequestException(
+        "Если не хотите указывать количество – просто не указывайте."
+      );
     }
     return filmService.getPopularFilms(count);
   }

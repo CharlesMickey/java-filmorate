@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
@@ -85,10 +84,10 @@ public class FilmService {
 
   public List<Film> getPopularFilms(Integer count) {
     return filmStorage
-            .getListFilms()
-            .stream()
-            .sorted(Comparator.comparingInt(film -> -film.getLikes().size()))
-            .limit(count)
-            .collect(Collectors.toList());
+      .getListFilms()
+      .stream()
+      .sorted(Comparator.comparingInt(film -> -film.getLikes().size()))
+      .limit(count)
+      .collect(Collectors.toList());
   }
 }
