@@ -37,6 +37,7 @@ public class UserController {
     log.debug("Put request /users, data transmitted: {}", user);
     return userService.updateUser(user);
   }
+
   @GetMapping("/users/{id}")
   public User getUserById(@PathVariable Integer id) {
     log.debug("Get request /user/{id}", id);
