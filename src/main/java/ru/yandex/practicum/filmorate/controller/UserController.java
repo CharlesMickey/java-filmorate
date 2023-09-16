@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import java.util.List;
-import java.util.Set;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +37,14 @@ public class UserController {
     log.debug("Put request /users, data transmitted: {}", user);
     return userService.updateUser(user);
   }
+  @GetMapping("/users/{id}")
+  public User getUserById(@PathVariable Integer id) {
+    log.debug("Get request /user/{id}", id);
+    return userService.getUserById(id);
+  }
 
-  @GetMapping("/user/{id}/friends")
-  public Set<Integer> getUserFriends(@PathVariable Integer id) {
+  @GetMapping("/users/{id}/friends")
+  public List<User> getUserFriends(@PathVariable Integer id) {
     log.debug("Get request /users/{}/friends", id);
     return userService.getAllFriends(id);
   }
@@ -64,7 +68,7 @@ public class UserController {
   }
 
   @GetMapping("/users/{id}/friends/common/{otherId}")
-  public List<String> getCommonFriends(
+  public List<User> getCommonFriends(
     @PathVariable Integer id,
     @PathVariable Integer otherId
   ) {

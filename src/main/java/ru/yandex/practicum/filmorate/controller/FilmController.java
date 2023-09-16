@@ -40,6 +40,12 @@ public class FilmController {
     return filmService.updateFilm(film);
   }
 
+  @GetMapping("/films/{id}")
+  public Film getFilmsById(@PathVariable Integer id) {
+    log.debug("Get request /films/{id}", id);
+    return filmService.getFilmById(id);
+  }
+
   @PutMapping("/films/{id}/like/{userId}")
   public Film addLike(@PathVariable Integer id, @PathVariable Integer userId) {
     log.debug("Put request /films/{}/like/{}", id, userId);

@@ -47,7 +47,15 @@ public class FilmService {
       throw new NotFoundException("Фильм не найден");
     }
 
-    return filmStorage.createFilm(film);
+    return filmStorage.updateFilm(film);
+  }
+
+  public Film getFilmById(Integer id) {
+    if (filmStorage.getFilms().get(id) == null) {
+      throw new NotFoundException("Фильм не найден");
+    }
+
+    return filmStorage.getFilms().get(id);
   }
 
   public Film addLike(Integer id, Integer userId) {

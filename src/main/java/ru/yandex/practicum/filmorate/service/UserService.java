@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,13 +38,25 @@ public class UserService {
     return userStorage.updateUser(user);
   }
 
-  public Set<Integer> getAllFriends(Integer id) {
+  public User getUserById(Integer id) {
+    if (userStorage.getUsers().get(id) == null) {
+      throw new NotFoundException("Пользователь не найден");
+    }
+
+    return userStorage.getUsers().get(id);
+  }
+
+  public List<User> getAllFriends(Integer id) {
     User user = userStorage.getUsers().get(id);
     if (user == null) {
       throw new NotFoundException("Пользователь не найден");
     }
 
-    return user.getFriends();
+    return user
+            .getFriends()
+            .stream()
+            .map(i -> userStorage.getUsers().get(i))
+            .collect(Collectors.toList());
   }
 
   public User addFriend(Integer id, Integer friendId) {
@@ -88,7 +99,7 @@ public class UserService {
     return user;
   }
 
-  public List<String> getCommonFriends(Integer id, Integer otherId) {
+  public List<User> getCommonFriends(Integer id, Integer otherId) {
     User user = userStorage.getUsers().get(id);
     User otherUser = userStorage.getUsers().get(otherId);
 
@@ -100,11 +111,11 @@ public class UserService {
       throw new NotFoundException("Друг не найден");
     }
 
-    List<String> listNames = user
+    List<User> listNames = user
       .getFriends()
       .stream()
       .filter(friend -> otherUser.getFriends().contains(friend))
-      .map(i -> userStorage.getUsers().get(i).getName())
+      .map(i -> userStorage.getUsers().get(i))
       .collect(Collectors.toList());
 
     return listNames;
