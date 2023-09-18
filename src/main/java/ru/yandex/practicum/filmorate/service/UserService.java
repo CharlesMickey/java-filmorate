@@ -3,23 +3,24 @@ package ru.yandex.practicum.filmorate.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 @Service
 public class UserService {
 
-  private final UserStorage userStorage;
+  private final Storage<User> userStorage;
 
   @Autowired
-  public UserService(UserStorage userStorage) {
+  public UserService(@Qualifier("inMemoryUserStorage") Storage<User> userStorage) {
     this.userStorage = userStorage;
   }
 
-  public List<User> getUsers() {
-    return userStorage.getListUsers();
+  public List<User> getListUsers() {
+    return userStorage.getListItems();
   }
 
   public User createUser(User user) {
@@ -27,41 +28,41 @@ public class UserService {
       user.setName(user.getLogin());
     }
 
-    return userStorage.createUser(user);
+    return userStorage.createItem(user);
   }
 
   public User updateUser(User user) {
-    if (userStorage.getUsers().get(user.getId()) == null) {
+    if (userStorage.getItems().get(user.getId()) == null) {
       throw new NotFoundException("Пользователь не найден");
     }
 
-    return userStorage.updateUser(user);
+    return userStorage.updateItem(user);
   }
 
   public User getUserById(Integer id) {
-    if (userStorage.getUsers().get(id) == null) {
+    if (userStorage.getItems().get(id) == null) {
       throw new NotFoundException("Пользователь не найден");
     }
 
-    return userStorage.getUsers().get(id);
+    return userStorage.getItems().get(id);
   }
 
   public List<User> getAllFriends(Integer id) {
-    User user = userStorage.getUsers().get(id);
+    User user = userStorage.getItems().get(id);
     if (user == null) {
       throw new NotFoundException("Пользователь не найден");
     }
 
     return user
-            .getFriends()
-            .stream()
-            .map(i -> userStorage.getUsers().get(i))
-            .collect(Collectors.toList());
+      .getFriends()
+      .stream()
+      .map(i -> userStorage.getItems().get(i))
+      .collect(Collectors.toList());
   }
 
   public User addFriend(Integer id, Integer friendId) {
-    User user = userStorage.getUsers().get(id);
-    User friend = userStorage.getUsers().get(friendId);
+    User user = userStorage.getItems().get(id);
+    User friend = userStorage.getItems().get(friendId);
     if (user == null) {
       throw new NotFoundException("Пользователь не найден");
     }
@@ -83,8 +84,8 @@ public class UserService {
   }
 
   public User deleteFriend(Integer id, Integer friendId) {
-    User user = userStorage.getUsers().get(id);
-    User friend = userStorage.getUsers().get(friendId);
+    User user = userStorage.getItems().get(id);
+    User friend = userStorage.getItems().get(friendId);
     if (user == null) {
       throw new NotFoundException("Пользователь не найден");
     }
@@ -100,8 +101,8 @@ public class UserService {
   }
 
   public List<User> getCommonFriends(Integer id, Integer otherId) {
-    User user = userStorage.getUsers().get(id);
-    User otherUser = userStorage.getUsers().get(otherId);
+    User user = userStorage.getItems().get(id);
+    User otherUser = userStorage.getItems().get(otherId);
 
     if (user == null) {
       throw new NotFoundException("Пользователь не найден");
@@ -115,7 +116,7 @@ public class UserService {
       .getFriends()
       .stream()
       .filter(friend -> otherUser.getFriends().contains(friend))
-      .map(i -> userStorage.getUsers().get(i))
+      .map(i -> userStorage.getItems().get(i))
       .collect(Collectors.toList());
 
     return listNames;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserStorage implements Storage<User> {
 
   private int id = 0;
   private final HashMap<Integer, User> users = new HashMap<>();
@@ -17,22 +17,22 @@ public class InMemoryUserStorage implements UserStorage {
     return id;
   }
 
-  public HashMap<Integer, User> getUsers() {
+  public HashMap<Integer, User> getItems() {
     return users;
   }
 
-  public List<User> getListUsers() {
+  public List<User> getListItems() {
     List<User> usersList = new ArrayList<>(users.values());
     return usersList;
   }
 
-  public User createUser(User user) {
+  public User createItem(User user) {
     user.setId(setId());
     users.put(user.getId(), user);
     return user;
   }
 
-  public User updateUser(User user) {
+  public User updateItem(User user) {
     users.put(user.getId(), user);
     return user;
   }

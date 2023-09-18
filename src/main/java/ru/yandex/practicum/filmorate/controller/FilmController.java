@@ -22,7 +22,7 @@ public class FilmController {
 
   @GetMapping("/films")
   public List<Film> getFilms() {
-    List<Film> filmsList = filmService.getFilms();
+    List<Film> filmsList = filmService.getListFilms();
     log.debug("Get request /films, data transmitted: {}", filmsList);
 
     return filmsList;
@@ -53,8 +53,7 @@ public class FilmController {
   }
 
   @DeleteMapping("/films/{id}/like/{userId}")
-  public Film deleteLike(
-    @PathVariable Integer id,
+  public Film deleteLike(@PathVariable Integer id,
     @PathVariable Integer userId
   ) {
     log.debug("Delete like request /films/{}/like/{}", id, userId);
@@ -63,11 +62,7 @@ public class FilmController {
 
   @GetMapping("/films/popular")
   public List<Film> getPopularFilms(
-    @RequestParam(
-      value = "count",
-      defaultValue = "10",
-      required = false
-    ) Integer count
+    @RequestParam(value = "count", defaultValue = "10") Integer count
   ) {
     if (count <= 0) {
       throw new BadRequestException(

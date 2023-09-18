@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorage implements Storage<Film> {
 
   private final HashMap<Integer, Film> films = new HashMap<>();
   private int id = 0;
@@ -17,22 +17,22 @@ public class InMemoryFilmStorage implements FilmStorage {
     return id;
   }
 
-  public HashMap<Integer, Film> getFilms() {
+  public HashMap<Integer, Film> getItems() {
     return films;
   }
 
-  public List<Film> getListFilms() {
+  public List<Film> getListItems() {
     List<Film> filmsList = new ArrayList<>(films.values());
     return filmsList;
   }
 
-  public Film createFilm(Film film) {
+  public Film createItem(Film film) {
     film.setId(setId());
     films.put(film.getId(), film);
     return film;
   }
 
-  public Film updateFilm(Film film) {
+  public Film updateItem(Film film) {
     films.put(film.getId(), film);
     return film;
   }

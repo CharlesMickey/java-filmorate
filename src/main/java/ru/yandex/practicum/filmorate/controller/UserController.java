@@ -21,7 +21,7 @@ public class UserController {
 
   @GetMapping("/users")
   public List<User> getUsers() {
-    List<User> usersList = userService.getUsers();
+    List<User> usersList = userService.getListUsers();
     log.debug("Get request /users, data transmitted: {}", usersList);
     return usersList;
   }
