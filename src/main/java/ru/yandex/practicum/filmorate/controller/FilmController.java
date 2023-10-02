@@ -53,7 +53,8 @@ public class FilmController {
   }
 
   @DeleteMapping("/films/{id}/like/{userId}")
-  public Film deleteLike(@PathVariable Integer id,
+  public Film deleteLike(
+    @PathVariable Integer id,
     @PathVariable Integer userId
   ) {
     log.debug("Delete like request /films/{}/like/{}", id, userId);
