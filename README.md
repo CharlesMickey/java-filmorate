@@ -4,7 +4,7 @@ Template repository for Filmorate project.
 
 DB scheme:
 
-![DB scheme](https://github.com/CharlesMickey/java-filmorate/blob/main/src/images/bd%20scheme.svg)
+![DB scheme](https://github.com/CharlesMickey/java-filmorate/blob/main/src/images/db%20scheme.svg)
 
 # #  Пример запросов:
 
