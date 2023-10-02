@@ -5,9 +5,10 @@ import com.google.gson.GsonBuilder;
 import java.time.LocalDate;
 
 public class JsonTransformer {
-    public static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
-        return gsonBuilder.create();
-    }
+
+  public static Gson getGson() {
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
+    return gsonBuilder.create();
+  }
 }
