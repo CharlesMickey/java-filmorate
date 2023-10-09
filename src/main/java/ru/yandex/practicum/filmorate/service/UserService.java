@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.StorageDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
@@ -14,13 +15,19 @@ public class UserService {
 
   private final Storage<User> userStorage;
 
+  private final StorageDao<User> storageDao;
+
   @Autowired
-  public UserService(@Qualifier("inMemoryUserStorage") Storage<User> userStorage) {
+  public UserService(
+    @Qualifier("inMemoryUserStorage") Storage<User> userStorage,
+    StorageDao<User> storageDao
+  ) {
     this.userStorage = userStorage;
+    this.storageDao = storageDao;
   }
 
   public List<User> getListUsers() {
-    return userStorage.getListItems();
+    return storageDao.getListItems();
   }
 
   public User createUser(User user) {
@@ -28,23 +35,20 @@ public class UserService {
       user.setName(user.getLogin());
     }
 
-    return userStorage.createItem(user);
+    return storageDao.createItem(user);
   }
 
   public User updateUser(User user) {
-    if (userStorage.getItems().get(user.getId()) == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
-
-    return userStorage.updateItem(user);
+    storageDao
+      .findItemById(user.getId())
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    return storageDao.updateItem(user);
   }
 
   public User getUserById(Integer id) {
-    if (userStorage.getItems().get(id) == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
-
-    return userStorage.getItems().get(id);
+    return storageDao
+      .findItemById(id)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
   }
 
   public List<User> getAllFriends(Integer id) {

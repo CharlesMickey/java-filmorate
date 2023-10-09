@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 @RestController
@@ -19,6 +21,36 @@ public class FilmController {
   public FilmController(FilmService filmService) {
     this.filmService = filmService;
   }
+
+  @GetMapping("/genres")
+  public List<Genre> getGenres() {
+    List<Genre> genreList = filmService.getListGenres();
+    log.debug("Get request /genres , data transmitted: {}", genreList);
+
+    return genreList;
+  }
+
+  @GetMapping("/genres/{id}")
+  public Genre getGenresById(@PathVariable Integer id) {
+    log.debug("Get request /genres/{id}", id);
+    return filmService.findGenreById(id);
+  }
+
+  @GetMapping("/mpa")
+  public List<Rating> getRatings() {
+    List<Rating> ratingsList = filmService.getListRatings();
+    log.debug("Get request /genres , data transmitted: {}", ratingsList);
+
+    return ratingsList;
+  }
+
+  @GetMapping("/mpa/{id}")
+  public Rating getRatingsById(@PathVariable Integer id) {
+    log.debug("Get request /mpa/{id}", id);
+    return filmService.findRatingById(id);
+  }
+
+
 
   @GetMapping("/films")
   public List<Film> getFilms() {
