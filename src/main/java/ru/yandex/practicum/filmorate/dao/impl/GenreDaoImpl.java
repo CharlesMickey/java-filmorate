@@ -10,11 +10,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.IdNameDao;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-
 @Component
 public class GenreDaoImpl implements IdNameDao<Genre> {
 
-  JdbcTemplate jdbcTemplate;
+  private final JdbcTemplate jdbcTemplate;
 
   public GenreDaoImpl(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
@@ -30,7 +29,7 @@ public class GenreDaoImpl implements IdNameDao<Genre> {
   @Override
   public Optional<Genre> findItemById(Integer id) {
     SqlRowSet srs = jdbcTemplate.queryForRowSet(
-      "select * from \"Genre\" where \"genre_id\" = ?",
+      "select * from \"Genre\" where \"genre_id\" = ? ORDER BY \"genre_id\" ASC",
       id
     );
 

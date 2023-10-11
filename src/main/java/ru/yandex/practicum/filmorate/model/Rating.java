@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
+import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class Rating {
-    private final Integer id;
+public class Rating implements Serializable {
 
-    private final String name;
+  private final Integer id;
+
+  private final String name;
 }

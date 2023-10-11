@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 @Component
 public class RatingDaoImpl implements IdNameDao<Rating> {
 
-  JdbcTemplate jdbcTemplate;
+  private final JdbcTemplate jdbcTemplate;
 
   public RatingDaoImpl(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;

@@ -1,29 +1,26 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FriendsDao;
 import ru.yandex.practicum.filmorate.dao.StorageDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Storage;
 
 @Service
 public class UserService {
 
-  private final Storage<User> userStorage;
-
   private final StorageDao<User> storageDao;
+  private final FriendsDao friendsDao;
 
   @Autowired
-  public UserService(
-    @Qualifier("inMemoryUserStorage") Storage<User> userStorage,
-    StorageDao<User> storageDao
-  ) {
-    this.userStorage = userStorage;
+  public UserService(StorageDao<User> storageDao, FriendsDao friendsDao) {
     this.storageDao = storageDao;
+    this.friendsDao = friendsDao;
   }
 
   public List<User> getListUsers() {
@@ -52,77 +49,71 @@ public class UserService {
   }
 
   public List<User> getAllFriends(Integer id) {
-    User user = userStorage.getItems().get(id);
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
+    storageDao
+      .findItemById(id)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+
+    List<Integer> friendsIds = friendsDao.getAllFriends(id);
+
+    List<User> listFriends = new ArrayList<>();
+
+    for (Integer friendId : friendsIds) {
+      Optional<User> friend = storageDao.findItemById(friendId);
+      friend.ifPresent(listFriends::add);
     }
 
-    return user
-      .getFriends()
-      .stream()
-      .map(i -> userStorage.getItems().get(i))
-      .collect(Collectors.toList());
+    return listFriends;
   }
 
-  public User addFriend(Integer id, Integer friendId) {
-    User user = userStorage.getItems().get(id);
-    User friend = userStorage.getItems().get(friendId);
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
+  public User addFriend(Integer userId, Integer friendId) {
+    User user = storageDao
+      .findItemById(userId)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-    if (friend == null) {
-      throw new NotFoundException("Друг не найден");
-    }
+    storageDao
+      .findItemById(friendId)
+      .orElseThrow(() -> new NotFoundException("Друг не найден"));
 
-    if (id == friendId) {
+    if (userId == friendId) {
       throw new NotFoundException(
         "Одиночиство не порок. Так что не добавляйте себя к себе в друзья"
       );
     }
 
-    user.getFriends().add(friendId);
-    friend.getFriends().add(id);
+    friendsDao.addFriend(userId, friendId);
 
     return user;
   }
 
-  public User deleteFriend(Integer id, Integer friendId) {
-    User user = userStorage.getItems().get(id);
-    User friend = userStorage.getItems().get(friendId);
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
+  public void deleteFriend(Integer userId, Integer friendId) {
+    storageDao
+      .findItemById(userId)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-    if (friend == null) {
-      throw new NotFoundException("Друг не найден");
-    }
+    storageDao
+      .findItemById(friendId)
+      .orElseThrow(() -> new NotFoundException("Друг не найден"));
 
-    user.getFriends().remove(friendId);
-    friend.getFriends().remove(id);
-
-    return user;
+    friendsDao.deleteFriend(userId, friendId);
   }
 
-  public List<User> getCommonFriends(Integer id, Integer otherId) {
-    User user = userStorage.getItems().get(id);
-    User otherUser = userStorage.getItems().get(otherId);
+  public List<User> getCommonFriends(Integer userId, Integer otherId) {
+    storageDao
+      .findItemById(userId)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
+    storageDao
+      .findItemById(otherId)
+      .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-    if (otherUser == null) {
-      throw new NotFoundException("Друг не найден");
-    }
+    List<User> userFriends = getAllFriends(userId);
+    List<User> otherFriend = getAllFriends(otherId);
 
-    List<User> listNames = user
-      .getFriends()
+    List<User> listUsers = userFriends
       .stream()
-      .filter(friend -> otherUser.getFriends().contains(friend))
-      .map(i -> userStorage.getItems().get(i))
+      .filter(friend -> otherFriend.contains(friend))
       .collect(Collectors.toList());
 
-    return listNames;
+    return listUsers;
   }
 }

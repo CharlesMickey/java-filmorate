@@ -20,7 +20,7 @@ import ru.yandex.practicum.filmorate.model.User;
 @Component
 public class UserStorageDaoImpl implements StorageDao<User> {
 
-  JdbcTemplate jdbcTemplate;
+  private final JdbcTemplate jdbcTemplate;
 
   public UserStorageDaoImpl(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
