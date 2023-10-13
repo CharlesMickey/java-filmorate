@@ -50,6 +50,11 @@ CREATE TABLE
         "birthday" date
     );
 
+-- Создание уникальных  email и login
+CREATE UNIQUE INDEX IF NOT EXISTS USER_EMAIL_UINDEX ON "User" ("email");
+
+CREATE UNIQUE INDEX IF NOT EXISTS USER_LOGIN_UINDEX ON "User" ("login");
+
 -- Создание таблицы Friends, если она не существует
 CREATE TABLE
     IF NOT EXISTS "Friends" (

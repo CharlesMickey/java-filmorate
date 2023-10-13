@@ -6,21 +6,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.IdNameDao;
 import ru.yandex.practicum.filmorate.dao.LikesDao;
 import ru.yandex.practicum.filmorate.dao.StorageDao;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 
 @Service
 public class FilmService {
-
-  private final IdNameDao<Genre> storageGenreDao;
-  private final IdNameDao<Rating> storageRatingDao;
 
   private final StorageDao<Film> filmStorageDao;
   private final StorageDao<User> userStorageDao;
@@ -29,37 +23,13 @@ public class FilmService {
 
   @Autowired
   public FilmService(
-    IdNameDao<Genre> storageGenreDao,
-    IdNameDao<Rating> storageRatingDao,
     StorageDao<Film> filmStorageDao,
     StorageDao<User> userStorageDao,
     LikesDao likesDao
   ) {
-    this.storageGenreDao = storageGenreDao;
-    this.storageRatingDao = storageRatingDao;
     this.filmStorageDao = filmStorageDao;
     this.userStorageDao = userStorageDao;
     this.likesDao = likesDao;
-  }
-
-  public List<Genre> getListGenres() {
-    return storageGenreDao.getListItems();
-  }
-
-  public Genre findGenreById(Integer id) {
-    return storageGenreDao
-      .findItemById(id)
-      .orElseThrow(() -> new NotFoundException("Жанр не найден"));
-  }
-
-  public List<Rating> getListRatings() {
-    return storageRatingDao.getListItems();
-  }
-
-  public Rating findRatingById(Integer id) {
-    return storageRatingDao
-      .findItemById(id)
-      .orElseThrow(() -> new NotFoundException("Рейтинг не найден"));
   }
 
   public List<Film> getListFilms() {

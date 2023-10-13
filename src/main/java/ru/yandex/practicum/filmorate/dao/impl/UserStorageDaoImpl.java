@@ -60,15 +60,14 @@ public class UserStorageDaoImpl implements StorageDao<User> {
 
     String name = rs.getString("name");
     LocalDate birthday = rs.getDate("birthday").toLocalDate();
-    Set<Integer> friends = new HashSet<>();
+
     User user = new User();
     user.setId(id);
     user.setEmail(email);
     user.setLogin(login);
-
     user.setName(name);
     user.setBirthday(birthday);
-    user.setFriends(friends);
+
     return user;
   }
 

@@ -20,7 +20,7 @@ public class UserController {
   }
 
   @GetMapping("/users")
-  public List<User> getUsers() {
+  public List<User> getListUsers() {
     List<User> usersList = userService.getListUsers();
     log.debug("Get request /users, data transmitted: {}", usersList);
     return usersList;
@@ -45,7 +45,7 @@ public class UserController {
   }
 
   @GetMapping("/users/{id}/friends")
-  public List<User> getUserFriends(@PathVariable Integer id) {
+  public List<User> getAllFriends(@PathVariable Integer id) {
     log.debug("Get request /users/{}/friends", id);
     return userService.getAllFriends(id);
   }
@@ -65,7 +65,7 @@ public class UserController {
     @PathVariable Integer friendId
   ) {
     log.debug("Delete request /users/{}/friends/{}", id, friendId);
-     userService.deleteFriend(id, friendId);
+    userService.deleteFriend(id, friendId);
   }
 
   @GetMapping("/users/{id}/friends/common/{otherId}")

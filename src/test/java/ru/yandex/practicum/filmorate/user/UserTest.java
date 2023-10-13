@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.dao.impl.UserStorageDaoImpl;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -31,6 +32,7 @@ public class UserTest {
     userStorage.createItem(user);
   }
 
+  @DirtiesContext
   @Test
   public void testGetListItems() {
     List<User> userOptional = userStorage.getListItems();
@@ -38,6 +40,7 @@ public class UserTest {
     assertThat(userOptional).as("Список пользователей пуст").isNotEmpty();
   }
 
+  @DirtiesContext
   @Test
   public void testFindUserById() {
     Optional<User> userOptional = userStorage.findItemById(1);
@@ -49,6 +52,7 @@ public class UserTest {
       );
   }
 
+  @DirtiesContext
   @Test
   void testCreateItem() {
     User newUser = new User();
@@ -64,6 +68,7 @@ public class UserTest {
     assertThat(createdUser.getEmail()).isEqualTo("newUserd@ya.ru");
   }
 
+  @DirtiesContext
   @Test
   void testUpdateItem() {
     User userToUpdate = new User();
