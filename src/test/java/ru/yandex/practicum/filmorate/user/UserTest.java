@@ -1,27 +1,27 @@
 package ru.yandex.practicum.filmorate.user;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.gson.Gson;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.annotation.DirtiesContext;
+import ru.yandex.practicum.filmorate.dao.impl.UserStorageDaoImpl;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.utils.JsonTransformer;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserTest {
 
+  private final UserStorageDaoImpl userStorage;
   private User user;
-
-  private static Gson jsonTransformer = JsonTransformer.getGson();
 
   @BeforeEach
   void setUp() {
@@ -29,91 +29,59 @@ public class UserTest {
     user.setEmail("user@example.com");
     user.setLogin("validLogin");
     user.setBirthday(LocalDate.of(1992, 1, 1));
+    userStorage.createItem(user);
   }
 
-  @Autowired
-  private MockMvc mockMvc;
-
+  @DirtiesContext
   @Test
-  public void testValidUser() throws Exception {
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/users")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(user))
-      )
-      .andExpect(MockMvcResultMatchers.status().isOk())
-      .andDo(print());
+  public void testGetListItems() {
+    List<User> userOptional = userStorage.getListItems();
+
+    assertThat(userOptional).as("Список пользователей пуст").isNotEmpty();
   }
 
+  @DirtiesContext
   @Test
-  public void testIsEmptyRequest() throws Exception {
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders.post("/users").contentType("application/json")
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andDo(print());
+  public void testFindUserById() {
+    Optional<User> userOptional = userStorage.findItemById(1);
+
+    assertThat(userOptional)
+      .isPresent()
+      .hasValueSatisfying(user ->
+        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+      );
   }
 
+  @DirtiesContext
   @Test
-  public void testNoValidUserEmail() throws Exception {
-    user.setEmail("userexample.com");
+  void testCreateItem() {
+    User newUser = new User();
+    newUser.setEmail("newUserd@ya.ru");
+    newUser.setLogin("Новыйлогин");
+    newUser.setName("Новое Имя");
+    newUser.setBirthday(LocalDate.of(1990, 1, 1));
 
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/users")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(user))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.email")
-          .value("Не верный формат email")
-      )
-      .andDo(print());
+    User createdUser = userStorage.createItem(newUser);
+
+    assertThat(createdUser).isNotNull();
+    assertThat(createdUser.getId()).isGreaterThan(0);
+    assertThat(createdUser.getEmail()).isEqualTo("newUserd@ya.ru");
   }
 
+  @DirtiesContext
   @Test
-  public void testNoValidUserBirthday() throws Exception {
-    user.setBirthday(LocalDate.of(2992, 1, 1));
+  void testUpdateItem() {
+    User userToUpdate = new User();
+    userToUpdate.setId(1);
+    userToUpdate.setEmail("updated@ya.ru");
+    userToUpdate.setLogin("Новое логин");
+    userToUpdate.setName("Новое имя");
+    userToUpdate.setBirthday(LocalDate.of(1980, 1, 1));
 
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/users")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(user))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.birthday")
-          .value("Дата рождения не может быть в будущем")
-      )
-      .andDo(print());
-  }
+    User updatedUser = userStorage.updateItem(userToUpdate);
 
-  @Test
-  public void testNoValidUseLogin() throws Exception {
-    user.setLogin("no valid Login");
-
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/users")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(user))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.login")
-          .value("В логине не должно быть пробелов")
-      )
-      .andDo(print());
+    assertThat(updatedUser).isNotNull();
+    assertThat(updatedUser.getId()).isEqualTo(1);
+    assertThat(updatedUser.getEmail()).isEqualTo("updated@ya.ru");
   }
 }

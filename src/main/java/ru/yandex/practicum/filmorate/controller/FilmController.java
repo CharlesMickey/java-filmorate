@@ -21,7 +21,7 @@ public class FilmController {
   }
 
   @GetMapping("/films")
-  public List<Film> getFilms() {
+  public List<Film> getListFilms() {
     List<Film> filmsList = filmService.getListFilms();
     log.debug("Get request /films, data transmitted: {}", filmsList);
 
@@ -41,7 +41,7 @@ public class FilmController {
   }
 
   @GetMapping("/films/{id}")
-  public Film getFilmsById(@PathVariable Integer id) {
+  public Film getFilmById(@PathVariable Integer id) {
     log.debug("Get request /films/{id}", id);
     return filmService.getFilmById(id);
   }

@@ -1,30 +1,33 @@
 package ru.yandex.practicum.filmorate.film;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.gson.Gson;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import ru.yandex.practicum.filmorate.dao.impl.FilmStorageDaoImpl;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.utils.JsonTransformer;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmTest {
 
-  private Film film;
-  private static Gson jsonTransformer = JsonTransformer.getGson();
+  private final FilmStorageDaoImpl filmStorage;
 
   @BeforeEach
   void setUp() {
-    film = new Film();
+    Rating mpa = new Rating(1, "G");
+    Film film = new Film();
     film.setName("Жизнь прекрасна");
     film.setDescription(
       "Времена Холокоста. Отец создает для сына фантастическую реальность, защищая его от ужасов войны." +
@@ -32,94 +35,67 @@ public class FilmTest {
     );
     film.setReleaseDate(LocalDate.of(1997, 1, 1));
     film.setDuration(1);
-  }
+    film.setMpa(mpa);
 
-  @Autowired
-  private MockMvc mockMvc;
-
-  @Test
-  public void testValidUser() throws Exception {
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/films")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(film))
-      )
-      .andExpect(MockMvcResultMatchers.status().isOk())
-      .andDo(print());
+    filmStorage.createItem(film);
   }
 
   @Test
-  public void testIsEmptyRequest() throws Exception {
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders.post("/films").contentType("application/json")
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andDo(print());
+  void testGetListItems() {
+    List<Film> films = filmStorage.getListItems();
+    assertThat(films).isNotEmpty();
   }
 
   @Test
-  public void testNoValidDescription() throws Exception {
-    film.setDescription(
-      "Фильм \"Жизнь прекрасна\" (La vita è bella) - итальянская драмеди, выпущенная в 1997 году, режиссированная и" +
-      " снятая Роберто Бениньи. Он рассказывает историю Гвидо, еврейского отца, и его маленького сына, Джошуа," +
-      " которые отправляются в невероятное путешествие, чтобы защитить свою жизнь и сохранить свой оптимизм во " +
-      "времена Холокоста."
-    );
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/films")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(film))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.description")
-          .value("Максимальная длина описания — 200 символов")
-      )
-      .andDo(print());
+  void testFindItemById() {
+    Optional<Film> filmOptional = filmStorage.findItemById(1);
+    assertThat(filmOptional).isPresent();
+
+    Film film = filmOptional.get();
+    assertThat(film.getId()).isEqualTo(1);
+    assertThat(film.getName()).isEqualTo("Жизнь прекрасна");
   }
 
   @Test
-  public void testNoValidFilmName() throws Exception {
-    film.setName("");
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/films")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(film))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.name")
-          .value("Название не может быть пустым")
-      )
-      .andDo(print());
+  void testCreateItem() {
+    Film newFilm = new Film();
+    newFilm.setName("Новый фильм");
+    newFilm.setDescription("Описание нового фильма");
+    newFilm.setReleaseDate(LocalDate.now());
+    newFilm.setDuration(120);
+    newFilm.setMpa(new Rating(1, "PG"));
+
+    Genre genre1 = new Genre(1, "Комедия");
+    Genre genre2 = new Genre(2, "Боевик");
+    Set<Genre> genres = Set.of(genre1, genre2);
+    newFilm.setGenres(genres);
+
+    Film createdFilm = filmStorage.createItem(newFilm);
+
+    assertThat(createdFilm).isNotNull();
+    assertThat(createdFilm.getId()).isGreaterThan(0);
+    assertThat(createdFilm.getName()).isEqualTo("Новый фильм");
   }
 
   @Test
-  public void testNoValidDuration() throws Exception {
-    film.setDuration(-1);
+  void testUpdateItem() {
+    Film filmToUpdate = new Film();
+    filmToUpdate.setId(1);
+    filmToUpdate.setName("Обновленное имя");
+    filmToUpdate.setDescription("Обновленное описание");
+    filmToUpdate.setReleaseDate(LocalDate.now());
+    filmToUpdate.setDuration(150);
+    filmToUpdate.setMpa(new Rating(2, "PG-13"));
 
-    mockMvc
-      .perform(
-        MockMvcRequestBuilders
-          .post("/films")
-          .contentType("application/json")
-          .content(jsonTransformer.toJson(film))
-      )
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(
-        MockMvcResultMatchers
-          .jsonPath("$.duration")
-          .value("Продолжительность фильма должна быть положительной")
-      )
-      .andDo(print());
+    Genre genre1 = new Genre(1, "Жанр 1");
+    Genre genre3 = new Genre(3, "Жанр 3");
+    Set<Genre> genres = Set.of(genre1, genre3);
+    filmToUpdate.setGenres(genres);
+
+    Film updatedFilm = filmStorage.updateItem(filmToUpdate);
+
+    assertThat(updatedFilm).isNotNull();
+    assertThat(updatedFilm.getId()).isEqualTo(1);
+    assertThat(updatedFilm.getName()).isEqualTo("Обновленное имя");
   }
 }

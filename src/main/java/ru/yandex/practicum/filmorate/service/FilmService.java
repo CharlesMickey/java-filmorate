@@ -5,32 +5,35 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.LikesDao;
+import ru.yandex.practicum.filmorate.dao.StorageDao;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Storage;
 
 @Service
 public class FilmService {
 
-  private final Storage<Film> filmStorage;
+  private final StorageDao<Film> filmStorageDao;
+  private final StorageDao<User> userStorageDao;
 
-  private final Storage<User> userStorage;
+  private final LikesDao likesDao;
 
   @Autowired
   public FilmService(
-    @Qualifier("inMemoryFilmStorage") Storage<Film> filmStorage,
-    @Qualifier("inMemoryUserStorage") Storage<User> userStorage
+    StorageDao<Film> filmStorageDao,
+    StorageDao<User> userStorageDao,
+    LikesDao likesDao
   ) {
-    this.filmStorage = filmStorage;
-    this.userStorage = userStorage;
+    this.filmStorageDao = filmStorageDao;
+    this.userStorageDao = userStorageDao;
+    this.likesDao = likesDao;
   }
 
   public List<Film> getListFilms() {
-    return filmStorage.getListItems();
+    return filmStorageDao.getListItems();
   }
 
   public Film createFilm(Film film) {
@@ -43,59 +46,53 @@ public class FilmService {
       );
     }
 
-    return filmStorage.createItem(film);
+    return filmStorageDao.createItem(film);
   }
 
   public Film updateFilm(Film film) {
-    if (filmStorage.getItems().get(film.getId()) == null) {
-      throw new NotFoundException("Фильм не найден");
-    }
+    filmStorageDao
+      .findItemById(film.getId())
+      .orElseThrow(() -> new NotFoundException("Фильм не найден"));
 
-    return filmStorage.updateItem(film);
+    return filmStorageDao.updateItem(film);
   }
 
   public Film getFilmById(Integer id) {
-    if (filmStorage.getItems().get(id) == null) {
-      throw new NotFoundException("Фильм не найден");
-    }
-
-    return filmStorage.getItems().get(id);
+    return filmStorageDao
+      .findItemById(id)
+      .orElseThrow(() -> new NotFoundException("Фильм не найден"));
   }
 
-  public Film addLike(Integer id, Integer userId) {
-    Film film = filmStorage.getItems().get(id);
-    User user = userStorage.getItems().get(userId);
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
+  public Film addLike(Integer filmId, Integer userId) {
+    Film film = filmStorageDao
+      .findItemById(filmId)
+      .orElseThrow(() -> new NotFoundException("Фильм не найден"));
 
-    if (film == null) {
-      throw new NotFoundException("Фильм не найден");
-    }
+    userStorageDao
+      .findItemById(userId)
+      .orElseThrow(() -> new NotFoundException("Поьзователь не найден"));
 
-    film.getLikes().add(userId);
+    likesDao.addLike(userId, filmId);
 
     return film;
   }
 
-  public Film deleteLike(Integer id, Integer userId) {
-    Film film = filmStorage.getItems().get(id);
-    User user = userStorage.getItems().get(userId);
-    if (user == null) {
-      throw new NotFoundException("Пользователь не найден");
-    }
+  public Film deleteLike(Integer filmId, Integer userId) {
+    Film film = filmStorageDao
+      .findItemById(filmId)
+      .orElseThrow(() -> new NotFoundException("Фильм не найден"));
 
-    if (film == null) {
-      throw new NotFoundException("Фильм не найден");
-    }
+    userStorageDao
+      .findItemById(userId)
+      .orElseThrow(() -> new NotFoundException("Поьзователь не найден"));
 
-    film.getLikes().remove(userId);
+    likesDao.deleteLike(userId, filmId);
 
     return film;
   }
 
   public List<Film> getPopularFilms(Integer count) {
-    return filmStorage
+    return filmStorageDao
       .getListItems()
       .stream()
       .sorted(Comparator.comparingInt(film -> -film.getLikes().size()))
